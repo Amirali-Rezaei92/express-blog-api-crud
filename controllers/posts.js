@@ -1,5 +1,16 @@
 import { posts } from "../data/posts.js";
 
+function slugify(text) {
+    return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w\-]+/g, "")
+        .replace(/\-\-+/g, "-");
+}
+
+
 export function index(req, res) {
     let results = posts;
 
@@ -24,6 +35,18 @@ export function show(req, res) {
 
     res.status(200).json(post);
 }
+export function showBySlug(req, res) {
+    const { slug } = req.params;
+    const post = posts.find(p => p.slug === slug);
+
+    if (!post) {
+        return res.status(404).json({ error: "Post non trovato" });
+    }
+
+    res.status(200).json(post);
+}
+
+
 
 export function update(req, res) {
     const { id } = req.params;
@@ -100,10 +123,27 @@ export function destroy(req, res) {
 }
 
 export function create(req, res) {
-    console.log("Dati ricevuti:", req.body);
+    const { title, content, image, tags, category } = req.body;
+
+    if (!title || !content) {
+        return res.status(400).json({ error: "Title e content obbligatori" });
+    }
+
+    const newPost = {
+        id: posts.length + 1,
+        title,
+        content,
+        image,
+        tags,
+        category,
+        slug: slugify(title)
+    };
+
+    posts.push(newPost);
 
     res.status(201).json({
-        messaggio: "Stai provando a creare dei dati",
-        dati: req.body
+        message: "Post creato con successo",
+        results: newPost
     });
 }
+
