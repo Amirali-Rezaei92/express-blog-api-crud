@@ -1,6 +1,6 @@
-const posts = require("../data/posts");
+import { posts } from "../data/posts.js";
 
-function index(req, res) {
+export function index(req, res) {
     let results = posts;
 
     if (req.query.category) {
@@ -14,7 +14,7 @@ function index(req, res) {
     res.status(200).json(results);
 }
 
-function show(req, res) {
+export function show(req, res) {
     const id = req.params.id;
     const post = posts.find(p => p.id == id);
 
@@ -25,7 +25,7 @@ function show(req, res) {
     res.status(200).json(post);
 }
 
-function update(req, res) {
+export function update(req, res) {
     const { id } = req.params;
     const realId = Number(id);
 
@@ -84,7 +84,7 @@ function update(req, res) {
     });
 }
 
-function destroy(req, res) {
+export function destroy(req, res) {
     const id = req.params.id;
     const index = posts.findIndex(p => p.id == id);
 
@@ -99,7 +99,7 @@ function destroy(req, res) {
     res.status(200).json({ message: `Post ${id} eliminato` });
 }
 
-function create(req, res) {
+export function create(req, res) {
     console.log("Dati ricevuti:", req.body);
 
     res.status(201).json({
@@ -107,5 +107,3 @@ function create(req, res) {
         dati: req.body
     });
 }
-
-module.exports = { index, show, destroy, update, create };

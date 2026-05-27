@@ -1,9 +1,10 @@
-const express = require("express");
+import express from "express";
+import postsRouter from "./routers/posts.js";
+
 const app = express();
 
 app.use(express.json());
 
-const postsRouter = require("./routers/posts");
 app.use("/posts", postsRouter);
 
 app.listen(3000, () => {
