@@ -10,7 +10,7 @@ function slugify(text) {
         .replace(/\-\-+/g, "-");
 }
 export function index(req, res) {
-    let results = posts.filter(p => !p.deleted); 
+    let results = posts.filter(p => !p.deleted);
 
     if (req.query.category) {
         results = results.filter(p => p.category === req.query.category);
@@ -25,15 +25,9 @@ export function index(req, res) {
 
 
 export function show(req, res) {
-    const id = Number(req.params.id);
-    const post = posts.find(p => p.id === id && !p.deleted);
-
-    if (!post) {
-        return res.status(404).json({ error: "Post non trovato" });
-    }
-
-    res.status(200).json(post);
+    res.json(req.post);
 }
+
 
 
 export function showBySlug(req, res) {
@@ -48,89 +42,33 @@ export function showBySlug(req, res) {
 }
 
 
-
-
 export function update(req, res) {
-    const { id } = req.params;
-    const realId = Number(id);
+    const { title, content, image, tags } = req.body;
 
-    if (isNaN(realId) || realId <= 0) {
-        return res.status(400).json({
-            error: 'ID non valido',
-            results: null
-        });
-    }
-
-    const postIndex = posts.findIndex(post => post.id === realId);
-
-    if (postIndex === -1) {
-        return res.status(404).json({
-            error: 'Post non trovato',
-            results: null
-        });
-    }
-
-    const { title, content, image, tags } = req.body || {};
-
-    if (!title || title.trim() === '') {
-        return res.status(400).json({
-            error: 'Il campo "title" è obbligatorio',
-            results: null
-        });
-    }
-
-    if (!content || content.trim() === '') {
-        return res.status(400).json({
-            error: 'Il campo "content" è obbligatorio',
-            results: null
-        });
-    }
-
-    if (!Array.isArray(tags)) {
-        return res.status(400).json({
-            error: 'Il campo "tags" deve essere un array',
-            results: null
-        });
-    }
-
-    const updatedPost = {
-        ...posts[postIndex],
-        title,
-        content,
-        image,
-        tags
-    };
-
-    posts[postIndex] = updatedPost;
+    req.post.title = title;
+    req.post.content = content;
+    req.post.image = image;
+    req.post.tags = tags;
 
     res.json({
-        message: 'Post aggiornato con successo',
-        results: updatedPost
+        message: "Post aggiornato con successo",
+        results: req.post
     });
 }
+
 export function destroy(req, res) {
-    const id = Number(req.params.id);
-    const post = posts.find(p => p.id === id);
+    req.post.deleted = true;
 
-    if (!post) {
-        return res.status(404).json({ error: "Post non trovato" });
-    }
-
-    post.deleted = true; 
-
-    res.status(200).json({
-        message: `Post ${id} soft-deleted`,
-        results: post
+    res.json({
+        message: "Post eliminato",
+        results: req.post
     });
 }
+
 
 
 export function create(req, res) {
-    const { title, content, image, tags, category } = req.body;
-
-    if (!title || !content) {
-        return res.status(400).json({ error: "Title e content obbligatori" });
-    }
+    const { title, content, image, tags } = req.body;
 
     const newPost = {
         id: posts.length + 1,
@@ -138,8 +76,7 @@ export function create(req, res) {
         content,
         image,
         tags,
-        category,
-        slug: slugify(title)
+        deleted: false
     };
 
     posts.push(newPost);
