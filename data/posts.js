@@ -10,6 +10,7 @@ export const posts = [
         published: true,
         prep_time: 20,
         created_at: "2024-01-15T09:00:00.000Z",
+        deleted:false,
     },
     {
         id: 2,
@@ -32,6 +33,7 @@ export const posts = [
         published: true,
         prep_time: 25,
         created_at: "2024-03-20T14:15:00.000Z",
+        deleted:false,
     },
     {
         id: 4,
@@ -43,6 +45,7 @@ export const posts = [
         published: false,
         prep_time: 15,
         created_at: "2024-04-08T08:45:00.000Z",
+        deleted:false,
     },
     {
         id: 5,
@@ -54,5 +57,6 @@ export const posts = [
         published: false,
         prep_time: 60,
         created_at: "2024-05-22T11:00:00.000Z",
+        deleted:false,
     },
 ];

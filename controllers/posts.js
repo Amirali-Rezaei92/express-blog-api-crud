@@ -9,10 +9,8 @@ function slugify(text) {
         .replace(/[^\w\-]+/g, "")
         .replace(/\-\-+/g, "-");
 }
-
-
 export function index(req, res) {
-    let results = posts;
+    let results = posts.filter(p => !p.deleted); 
 
     if (req.query.category) {
         results = results.filter(p => p.category === req.query.category);
@@ -25,9 +23,10 @@ export function index(req, res) {
     res.status(200).json(results);
 }
 
+
 export function show(req, res) {
-    const id = req.params.id;
-    const post = posts.find(p => p.id == id);
+    const id = Number(req.params.id);
+    const post = posts.find(p => p.id === id && !p.deleted);
 
     if (!post) {
         return res.status(404).json({ error: "Post non trovato" });
@@ -35,9 +34,11 @@ export function show(req, res) {
 
     res.status(200).json(post);
 }
+
+
 export function showBySlug(req, res) {
     const { slug } = req.params;
-    const post = posts.find(p => p.slug === slug);
+    const post = posts.find(p => p.slug === slug && !p.deleted);
 
     if (!post) {
         return res.status(404).json({ error: "Post non trovato" });
@@ -45,6 +46,7 @@ export function showBySlug(req, res) {
 
     res.status(200).json(post);
 }
+
 
 
 
@@ -106,21 +108,22 @@ export function update(req, res) {
         results: updatedPost
     });
 }
-
 export function destroy(req, res) {
-    const id = req.params.id;
-    const index = posts.findIndex(p => p.id == id);
+    const id = Number(req.params.id);
+    const post = posts.find(p => p.id === id);
 
-    if (index === -1) {
+    if (!post) {
         return res.status(404).json({ error: "Post non trovato" });
     }
 
-    posts.splice(index, 1);
+    post.deleted = true; 
 
-    console.log("Lista aggiornata:", posts);
-
-    res.status(200).json({ message: `Post ${id} eliminato` });
+    res.status(200).json({
+        message: `Post ${id} soft-deleted`,
+        results: post
+    });
 }
+
 
 export function create(req, res) {
     const { title, content, image, tags, category } = req.body;
